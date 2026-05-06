@@ -1,5 +1,634 @@
-import { AppShell } from '@/components/app-shell';
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ТурнирХаб — Платформа управления турнирами</title>
+  <meta name="description" content="Универсальный онлайн-сервис для создания, управления и визуализации турнирных сеток. Олимпийская, круговая и двойная олимпийская системы.">
+  <meta name="keywords" content="турнир, брекеты, управление, спортивные турниры, турнирные сетки">
+  <meta property="og:title" content="ТурнирХаб — Управление турнирами">
+  <meta property="og:description" content="Платформа для создания и управления спортивными турнирами">
+  <meta property="og:image" content="og-image.png">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ТурнирХаб">
+  <meta name="twitter:image" content="og-image.png">
 
-export default function Home() {
-  return <AppShell />;
-}
+  <link rel="icon" type="image/svg+xml" href="logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --emerald-50: #ecfdf5; --emerald-100: #d1fae5; --emerald-200: #a7f3d0;
+      --emerald-300: #6ee7b7; --emerald-400: #34d399; --emerald-500: #10b981;
+      --emerald-600: #059669; --emerald-700: #047857; --emerald-800: #065f46;
+      --emerald-900: #064e3b; --emerald-950: #022c22;
+
+      --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb;
+      --gray-300: #d1d5db; --gray-400: #9ca3af; --gray-500: #6b7280;
+      --gray-600: #4b5563; --gray-700: #374151; --gray-800: #1f2937;
+      --gray-900: #111827; --gray-950: #030712;
+
+      --bg: var(--gray-950); --surface: var(--gray-900); --surface-2: var(--gray-800);
+      --text: var(--gray-100); --text-2: var(--gray-400);
+      --accent: var(--emerald-500); --accent-2: var(--emerald-400);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ── Navigation ───────────────────────────────── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      background: rgba(3, 7, 18, 0.75);
+      border-bottom: 1px solid rgba(16, 185, 129, 0.08);
+      transition: all 0.3s ease;
+    }
+    .nav-inner {
+      max-width: 1200px; margin: 0 auto;
+      padding: 0 24px; height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 800; font-size: 1.2rem; letter-spacing: -0.02em;
+    }
+    .nav-logo svg { width: 28px; height: 28px; }
+    .nav-logo span {
+      background: linear-gradient(135deg, var(--emerald-400), var(--emerald-300));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .nav-links { display: flex; gap: 8px; align-items: center; }
+    .nav-links a {
+      padding: 8px 16px; border-radius: 8px; font-size: 0.875rem;
+      font-weight: 500; color: var(--gray-400);
+      transition: all 0.2s ease;
+    }
+    .nav-links a:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+    .nav-gh {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 18px; border-radius: 8px; font-size: 0.875rem;
+      font-weight: 600; color: #fff;
+      background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
+      transition: all 0.2s ease;
+    }
+    .nav-gh:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.2); }
+    .nav-gh svg { width: 18px; height: 18px; }
+
+    /* ── Hero ─────────────────────────────────────── */
+    .hero {
+      position: relative; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; padding: 120px 24px 80px;
+    }
+    .hero-bg {
+      position: absolute; inset: 0; z-index: 0;
+      background: url('hero-bg.png') center/cover no-repeat;
+      opacity: 0.2; filter: blur(2px);
+    }
+    .hero::after {
+      content: ''; position: absolute; inset: 0; z-index: 1;
+      background: linear-gradient(180deg, var(--bg) 0%, transparent 20%, transparent 70%, var(--bg) 100%);
+    }
+    .hero-grid {
+      position: absolute; inset: 0; z-index: 1;
+      background-image:
+        linear-gradient(rgba(16,185,129,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(16,185,129,0.03) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+      -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+    }
+    .hero-content {
+      position: relative; z-index: 2;
+      max-width: 800px; text-align: center;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 16px; border-radius: 100px;
+      background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2);
+      font-size: 0.8rem; font-weight: 600; color: var(--emerald-400);
+      margin-bottom: 32px;
+      animation: fadeInUp 0.8s ease both;
+    }
+    .hero-badge .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--emerald-400);
+      animation: pulse 2s ease infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.5); }
+    }
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 900; line-height: 1.08;
+      letter-spacing: -0.03em;
+      margin-bottom: 24px;
+      animation: fadeInUp 0.8s ease 0.1s both;
+    }
+    .hero h1 .grad {
+      background: linear-gradient(135deg, var(--emerald-300), var(--emerald-500), var(--emerald-400));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-desc {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--gray-400); max-width: 600px;
+      margin: 0 auto 40px; line-height: 1.7;
+      animation: fadeInUp 0.8s ease 0.2s both;
+    }
+    .hero-actions {
+      display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+      animation: fadeInUp 0.8s ease 0.3s both;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 28px; border-radius: 12px;
+      font-size: 0.95rem; font-weight: 600; cursor: pointer;
+      transition: all 0.25s ease; border: none; font-family: inherit;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--emerald-600), var(--emerald-500));
+      color: #fff; box-shadow: 0 4px 24px rgba(16,185,129,0.3);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(16,185,129,0.4);
+    }
+    .btn-ghost {
+      background: rgba(255,255,255,0.05);
+      color: var(--gray-300); border: 1px solid rgba(255,255,255,0.1);
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,0.08); color: #fff; }
+    .btn svg { width: 18px; height: 18px; }
+
+    .hero-stats {
+      display: flex; justify-content: center; gap: 48px; flex-wrap: wrap;
+      margin-top: 64px; animation: fadeInUp 0.8s ease 0.4s both;
+    }
+    .hero-stat { text-align: center; }
+    .hero-stat-num {
+      font-size: 2rem; font-weight: 800;
+      background: linear-gradient(135deg, var(--emerald-400), var(--emerald-300));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-stat-label { font-size: 0.8rem; color: var(--gray-500); font-weight: 500; margin-top: 4px; }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Section ─────────────────────────────────── */
+    .section {
+      max-width: 1200px; margin: 0 auto;
+      padding: 100px 24px;
+    }
+    .section-label {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 0.8rem; font-weight: 600;
+      color: var(--emerald-400); text-transform: uppercase;
+      letter-spacing: 0.1em; margin-bottom: 16px;
+    }
+    .section-label::before {
+      content: ''; width: 24px; height: 2px;
+      background: var(--emerald-500);
+    }
+    .section-title {
+      font-size: clamp(1.75rem, 4vw, 2.75rem);
+      font-weight: 800; letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+    .section-sub {
+      font-size: 1.05rem; color: var(--gray-400);
+      max-width: 600px; line-height: 1.7;
+    }
+
+    /* ── Features ────────────────────────────────── */
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px; margin-top: 56px;
+    }
+    .feature-card {
+      padding: 32px; border-radius: 16px;
+      background: var(--surface); border: 1px solid rgba(255,255,255,0.05);
+      transition: all 0.3s ease;
+    }
+    .feature-card:hover {
+      border-color: rgba(16,185,129,0.2);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    }
+    .feature-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(16,185,129,0.1); margin-bottom: 20px;
+    }
+    .feature-icon svg { width: 24px; height: 24px; stroke: var(--emerald-400); }
+    .feature-card h3 {
+      font-size: 1.1rem; font-weight: 700; margin-bottom: 8px;
+    }
+    .feature-card p { font-size: 0.9rem; color: var(--gray-400); line-height: 1.6; }
+
+    /* ── Formats ─────────────────────────────────── */
+    .formats-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px; margin-top: 56px;
+    }
+    .format-card {
+      padding: 32px; border-radius: 16px; text-align: center;
+      background: var(--surface); border: 1px solid rgba(255,255,255,0.05);
+      transition: all 0.3s ease;
+    }
+    .format-card:hover {
+      border-color: rgba(16,185,129,0.3);
+      transform: translateY(-4px);
+    }
+    .format-icon {
+      width: 72px; height: 72px; border-radius: 20px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px; font-size: 2rem;
+    }
+    .format-card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 8px; }
+    .format-card p { font-size: 0.85rem; color: var(--gray-400); line-height: 1.6; }
+    .format-tag {
+      display: inline-block; margin-top: 16px;
+      padding: 4px 12px; border-radius: 100px;
+      font-size: 0.75rem; font-weight: 600;
+    }
+
+    /* ── Tech Stack ──────────────────────────────── */
+    .tech-grid {
+      display: flex; flex-wrap: wrap; gap: 16px; margin-top: 48px;
+      justify-content: center;
+    }
+    .tech-chip {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 24px; border-radius: 12px;
+      background: var(--surface); border: 1px solid rgba(255,255,255,0.06);
+      font-size: 0.9rem; font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    .tech-chip:hover { border-color: rgba(16,185,129,0.2); }
+    .tech-chip .dot {
+      width: 10px; height: 10px; border-radius: 3px;
+    }
+
+    /* ── Code Preview ────────────────────────────── */
+    .code-block {
+      margin-top: 48px; border-radius: 16px; overflow: hidden;
+      background: var(--gray-900); border: 1px solid rgba(255,255,255,0.06);
+    }
+    .code-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .code-dots { display: flex; gap: 6px; }
+    .code-dots span {
+      width: 12px; height: 12px; border-radius: 50%;
+    }
+    .code-dots span:nth-child(1) { background: #ef4444; }
+    .code-dots span:nth-child(2) { background: #f59e0b; }
+    .code-dots span:nth-child(3) { background: #22c55e; }
+    .code-title { font-size: 0.8rem; color: var(--gray-500); font-weight: 500; }
+    .code-copy {
+      padding: 4px 12px; border-radius: 6px; border: none;
+      background: rgba(255,255,255,0.05); color: var(--gray-400);
+      font-size: 0.75rem; cursor: pointer; font-family: inherit;
+      transition: all 0.2s ease;
+    }
+    .code-copy:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .code-body {
+      padding: 24px; overflow-x: auto;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 0.8rem; line-height: 1.8; color: var(--gray-300);
+    }
+    .code-body .c1 { color: var(--emerald-400); }
+    .code-body .c2 { color: #f59e0b; }
+    .code-body .c3 { color: #8b5cf6; }
+    .code-body .c4 { color: var(--gray-600); }
+    .code-body .c5 { color: #ec4899; }
+
+    /* ── Footer ──────────────────────────────────── */
+    .footer {
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 40px 24px; text-align: center;
+    }
+    .footer-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; flex-direction: column; align-items: center; gap: 16px;
+    }
+    .footer-logo {
+      display: flex; align-items: center; gap: 8px;
+      font-weight: 700; font-size: 1rem;
+    }
+    .footer-logo svg { width: 20px; height: 20px; stroke: var(--emerald-500); }
+    .footer p { font-size: 0.8rem; color: var(--gray-500); }
+    .footer a { color: var(--emerald-400); }
+    .footer a:hover { text-decoration: underline; }
+
+    /* ── Responsive ──────────────────────────────── */
+    @media (max-width: 768px) {
+      .nav-links .link-text { display: none; }
+      .hero { padding: 100px 20px 60px; }
+      .hero-stats { gap: 32px; }
+      .features-grid, .formats-grid { grid-template-columns: 1fr; }
+      .section { padding: 64px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--emerald-400)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+          <path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20 7 22"/>
+          <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20 17 22"/>
+          <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+        </svg>
+        <span>ТурнирХаб</span>
+      </a>
+      <div class="nav-links">
+        <a href="#features"><span class="link-text">Возможности</span></a>
+        <a href="#formats"><span class="link-text">Форматы</span></a>
+        <a href="#tech"><span class="link-text">Технологии</span></a>
+        <a href="#" class="nav-gh" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        Открытый исходный код
+      </div>
+      <h1>
+        Управление<br><span class="grad">турнирами</span><br>нового поколения
+      </h1>
+      <p class="hero-desc">
+        Создавайте турнирные сетки любой сложности, управляйте командами,
+        отслеживайте результаты в реальном времени и экспортируйте данные.
+      </p>
+      <div class="hero-actions">
+        <a href="#features" class="btn btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+          Обзор возможностей
+        </a>
+        <a href="#" class="btn btn-gh">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+          Исходный код
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-num">3</div>
+          <div class="hero-stat-label">Формата турниров</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num">15</div>
+          <div class="hero-stat-label">API-маршрутов</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num">3200+</div>
+          <div class="hero-stat-label">Строк кода</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num">4</div>
+          <div class="hero-stat-label">UI-компонента</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="section" id="features">
+    <div class="section-label">Возможности</div>
+    <h2 class="section-title">Всё для организации турниров</h2>
+    <p class="section-sub">Полный набор инструментов от создания до завершения турнира</p>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+            <polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/>
+          </svg>
+        </div>
+        <h3>Конструктор турниров</h3>
+        <p>Трёхшаговый мастер создания: основная информация, настройки формата, система очков и даты. Полная настройка каждого параметра.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+          </svg>
+        </div>
+        <h3>Турнирные сетки</h3>
+        <p>Автоматическая генерация визуальных сеток с правильным посевом команд. Олимпийская, круговая и двойная олимпийская системы.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <h3>Управление командами</h3>
+        <p>Регистрация команд с назначением посевов, управление составами и ролями игроков: капитан, вице-капитан, игрок.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/>
+          </svg>
+        </div>
+        <h3>Турнирная таблица</h3>
+        <p>Автоматический подсчёт очков, ранжирование команд, отслеживание побед, поражений, ничьих и разницы забитых/пропущенных.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+        </div>
+        <h3>Автоматизация</h3>
+        <p>Автопродвижение победителей в следующий раунд, автозавершение турнира, автоматический пересчёт таблицы после каждого матча.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+        </div>
+        <h3>Экспорт данных</h3>
+        <p>Полный экспорт турнира в CSV: информация, команды с составами, все матчи с результатами, итоговая таблица.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Formats -->
+  <section class="section" id="formats">
+    <div class="section-label">Форматы</div>
+    <h2 class="section-title">Три формата турниров</h2>
+    <p class="section-sub">Выберите оптимальную систему для вашего соревнования</p>
+
+    <div class="formats-grid">
+      <div class="format-card">
+        <div class="format-icon" style="background: rgba(16,185,129,0.1);">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-400)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+            <path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20 7 22"/>
+            <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20 17 22"/>
+            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+          </svg>
+        </div>
+        <h3>Олимпийская система</h3>
+        <p>Проигравший выбывает. Классический формат плей-офф с правильным посевом команд и автоматическим продвижением победителей.</p>
+        <span class="format-tag" style="background: rgba(16,185,129,0.1); color: var(--emerald-400);">single_elimination</span>
+      </div>
+      <div class="format-card">
+        <div class="format-icon" style="background: rgba(245,158,11,0.1);">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </div>
+        <h3>Двойная олимпийская</h3>
+        <p>Два шанса на победу. Сетка победителей и сетка проигравших с гранд-финалом между чемпионами обеих сеток.</p>
+        <span class="format-tag" style="background: rgba(245,158,11,0.1); color: #f59e0b;">double_elimination</span>
+      </div>
+      <div class="format-card">
+        <div class="format-icon" style="background: rgba(139,92,246,0.1);">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+          </svg>
+        </div>
+        <h3>Круговая система</h3>
+        <p>Каждая команда играет с каждой. Метод кругового вращения обеспечивает справедливое распределение домашних матчей.</p>
+        <span class="format-tag" style="background: rgba(139,92,246,0.1); color: #8b5cf6;">round_robin</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tech Stack -->
+  <section class="section" id="tech">
+    <div class="section-label">Технологии</div>
+    <h2 class="section-title">Современный стек</h2>
+    <p class="section-sub">Построен на передовых технологиях с упором на производительность и developer experience</p>
+
+    <div class="tech-grid">
+      <div class="tech-chip"><span class="dot" style="background: #ffffff;"></span>Next.js 16</div>
+      <div class="tech-chip"><span class="dot" style="background: #3178c6;"></span>TypeScript 5</div>
+      <div class="tech-chip"><span class="dot" style="background: #06b6d4;"></span>Tailwind CSS 4</div>
+      <div class="tech-chip"><span class="dot" style="background: #a855f7;"></span>shadcn/ui</div>
+      <div class="tech-chip"><span class="dot" style="background: #2d3748;"></span>Prisma ORM</div>
+      <div class="tech-chip"><span class="dot" style="background: #f59e0b;"></span>Zustand</div>
+      <div class="tech-chip"><span class="dot" style="background: #ef4444;"></span>Framer Motion</div>
+      <div class="tech-chip"><span class="dot" style="background: #22c55e;"></span>SQLite</div>
+      <div class="tech-chip"><span class="dot" style="background: #ec4899;"></span>TanStack Query</div>
+      <div class="tech-chip"><span class="dot" style="background: #f97316;"></span>React Hook Form</div>
+      <div class="tech-chip"><span class="dot" style="background: #0ea5e9;"></span>date-fns</div>
+      <div class="tech-chip"><span class="dot" style="background: #14b8a6;"></span>Lucide Icons</div>
+    </div>
+
+    <!-- API Preview -->
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-title">api/tournaments/[id]/start/route.ts</span>
+        <button class="code-copy" onclick="this.textContent='Скопировано!'; setTimeout(()=>this.textContent='Копировать', 1500)">Копировать</button>
+      </div>
+      <div class="code-body">
+<pre><span class="c4">// Генерация турнирной сетки и запуск турнира</span>
+<span class="c1">export async function</span> <span class="c3">POST</span>(request, { params }) {
+  <span class="c1">const</span> { id } = <span class="c1">await</span> params;
+  <span class="c1">const</span> tournament = <span class="c1">await</span> db.tournament.findUnique({
+    where: { id },
+    include: { teams: { include: { team: <span class="c2">true</span> } } }
+  });
+
+  <span class="c4">// Подготовка посевных команд</span>
+  <span class="c1">const</span> seedTeams = tournament.teams.<span class="c3">map</span>(tt => ({
+    id: tt.id, teamId: tt.teamId, seed: tt.seed
+  }));
+
+  <span class="c4">// Генерация сетки по выбранному формату</span>
+  <span class="c1">const</span> bracketMatches = <span class="c3">generateBracket</span>(
+    tournament.format, seedTeams
+  );
+
+  <span class="c4">// Создание матчей в БД со связями nextMatchId</span>
+  <span class="c1">for</span> (<span class="c1">const</span> match <span class="c1">of</span> bracketMatches) {
+    <span class="c1">await</span> db.match.<span class="c3">create</span>({
+      data: { tournamentId: id, ...match, status: <span class="c5">'pending'</span> }
+    });
+  }
+
+  <span class="c4">// Инициализация турнирной таблицы</span>
+  <span class="c1">await</span> db.tournament.<span class="c3">update</span>({
+    where: { id },
+    data: { status: <span class="c5">'active'</span>, startDate: <span class="c1">new</span> Date() }
+  });
+}</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+          <path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20 7 22"/>
+          <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20 17 22"/>
+          <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+        </svg>
+        ТурнирХаб
+      </div>
+      <p>Платформа для организации и управления спортивными турнирами</p>
+      <p>
+        Построен с <span style="color: #ef4444;">&#9829;</span> на Next.js, TypeScript, Tailwind CSS, Prisma &amp; shadcn/ui
+      </p>
+      <p style="margin-top: 8px;">
+        &copy; <span id="year"></span> ТурнирХаб &middot;
+        <a href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener">MIT License</a>
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
