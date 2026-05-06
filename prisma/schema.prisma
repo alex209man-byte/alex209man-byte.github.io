@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Tournament {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  sport       String   @default("Общий")
+  
+  // Tournament format
+  format      String   @default("single_elimination") // single_elimination, double_elimination, round_robin, swiss
+  maxTeams    Int      @default(8)
+  
+  // Match settings
+  winsNeeded  Int      @default(1) // best of N
+  pointsWin   Int      @default(3)
+  pointsDraw  Int      @default(1)
+  pointsLoss  Int      @default(0)
+  
+  // Dates
+  startDate   DateTime?
+  endDate     DateTime?
+  
+  // Status
+  status      String   @default("draft") // draft, registration, active, completed, archived
+  
+  // Visual
+  coverColor  String   @default("#10b981")
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  teams    TournamentTeam[]
+  matches  Match[]
+  standings Standing[]
+}
+
+model TournamentTeam {
+  id           String    @id @default(cuid())
+  tournamentId String
+  teamId       String
+  
+  seed         Int       @default(0)
+  
+  tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  team         Team       @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  players      Player[]
+  
+  @@unique([tournamentId, teamId])
+}
+
+model Team {
+  id          String    @id @default(cuid())
+  name        String
+  tag         String?
+  logo        String?
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  tournaments TournamentTeam[]
+}
+
+model Player {
+  id           String @id @default(cuid())
+  name         String
+  role         String @default("Игрок")
+  tournamentTeamId String
+  
+  tournamentTeam TournamentTeam @relation(fields: [tournamentTeamId], references: [id], onDelete: Cascade)
+}
+
+model Match {
+  id           String    @id @default(cuid())
+  tournamentId String
+  round        Int       @default(1)
+  position     Int       @default(0)
+  
+  team1Id      String?
+  team2Id      String?
+  
+  score1       Int       @default(0)
+  score2       Int       @default(0)
+  
+  status       String    @default("pending")
+  
+  bracket      String    @default("winners")
+  nextMatchId  String?
+  
+  scheduledAt  DateTime?
+  completedAt  DateTime?
+  venue        String?
+  
+  tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Standing {
+  id             String @id @default(cuid())
+  tournamentId   String
+  teamId         String
+  teamName       String
+  played         Int    @default(0)
+  wins           Int    @default(0)
+  draws          Int    @default(0)
+  losses         Int    @default(0)
+  pointsFor      Int    @default(0)
+  pointsAgainst  Int    @default(0)
+  points         Int    @default(0)
+  rank           Int    @default(0)
+  
+  tournament     Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  
+  @@unique([tournamentId, teamId])
+}
